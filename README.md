@@ -1,2 +1,3 @@
-# Programacion-M2S2-2018
-Repositorio para la asignatura "Base de datos avanzadas" de la carrera de programación
+## M2S2 - Diseña y administra bases de datos avanzadas (64 Horas)
+
+[Wiki](https://github.com/dgeti-cetis108/Programacion-M2S2-2018/wiki)
