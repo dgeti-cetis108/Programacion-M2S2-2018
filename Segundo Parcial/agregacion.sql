@@ -118,6 +118,34 @@ select
 from calificaciones c
 group by carrera, nombre_asignatura;
 
+-- consulta que muestre los grupos y asignaturas
+-- debe tener una asignatura por cada grupo sin repetir
+-- agregar la columna periodo con el valor 'SEMESTRAL 2 - 2017'
+-- nota: por cada carrera existen grupos con asignaturas
+insert into grupos (carrera_id,turno,grupo,semestre,asignatura_id,periodo)
+select
+	(select id from carreras where nombre = c.carrera) as 'carrera_id',
+  turno,
+	concat(grupo,left(turno,1),'-',left(carrera,3)) as 'grupo', -- 2AV-PRO
+  semestre,
+  (select id from asignaturas where nombre = c.nombre_asignatura) as 'asignatura_id',
+  'SEMESTRAL 2 - 2017' as 'periodo'
+from calificaciones c
+group by carrera, turno, c.grupo, nombre_asignatura;
+
+-- crear tabla grupos
+create table grupos (
+	id int auto_increment primary key,
+  carrera_id int not null,
+  turno enum('MATUTINO','VESPERTINO') not null,
+  grupo char(7) not null,
+  semestre tinyint unsigned not null,
+  asignatura_id int not null,
+  periodo varchar(100) not null,
+  unique key (grupo, asignatura_id, periodo)
+) engine=innodb, charset=utf8, collate=utf8_general_ci;
+
+-- consulta para mostrar calificaciones del alumno
 
 
 
