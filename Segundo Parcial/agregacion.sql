@@ -122,16 +122,15 @@ group by carrera, nombre_asignatura;
 -- debe tener una asignatura por cada grupo sin repetir
 -- agregar la columna periodo con el valor 'SEMESTRAL 2 - 2017'
 -- nota: por cada carrera existen grupos con asignaturas
-insert into grupos (carrera_id,turno,grupo,semestre,asignatura_id,periodo)
+insert into grupos (carrera_id,turno,grupo,semestre,periodo)
 select
 	(select id from carreras where nombre = c.carrera) as 'carrera_id',
   turno,
 	concat(grupo,left(turno,1),'-',left(carrera,3)) as 'grupo', -- 2AV-PRO
   semestre,
-  (select id from asignaturas where nombre = c.nombre_asignatura) as 'asignatura_id',
   'SEMESTRAL 2 - 2017' as 'periodo'
 from calificaciones c
-group by carrera, turno, c.grupo, nombre_asignatura;
+group by carrera, turno, c.grupo;
 
 -- crear tabla grupos
 create table grupos (
@@ -140,12 +139,67 @@ create table grupos (
   turno enum('MATUTINO','VESPERTINO') not null,
   grupo char(7) not null,
   semestre tinyint unsigned not null,
-  asignatura_id int not null,
   periodo varchar(100) not null,
-  unique key (grupo, asignatura_id, periodo)
+  unique key (grupo, periodo)
 ) engine=innodb, charset=utf8, collate=utf8_general_ci;
 
 -- consulta para mostrar calificaciones del alumno
+insert into notas (no_control,grupo_id,asignatura_id,parcial1,parcial2,parcial3,asistencias1,asistencias2,asistencias3,tipo_acreditacion)
+SELECT 
+    no_control,
+    (SELECT 
+            id
+        FROM
+            grupos
+        WHERE
+            grupo = CONCAT(c.grupo,
+                    LEFT(c.turno, 1),
+                    '-',
+                    LEFT(c.carrera, 3))
+                AND periodo = 'SEMESTRAL 2 - 2017') AS 'grupo_id',
+    (select id from asignaturas where nombre = c.nombre_asignatura) as 'asignatura_id',
+    parcial1,
+    parcial2,
+    parcial3,
+    asistencias1,
+    asistencias2,
+    asistencias3,
+    tipo_acreditacion
+FROM
+    calificaciones c;
+	
+-- crear tabla para notas
+create table notas (
+	id int auto_increment primary key,
+  no_control varchar(20) not null,
+  grupo_id int not null,
+  asignatura_id int not null,
+  parcial1 float(3,1) default null,
+  parcial2 float(3,1) default null,
+  parcial3 float(3,1) default null,
+  asistencias1 int default null,
+  asistencias2 int default null,
+  asistencias3 int default null,
+  tipo_acreditacion enum('A','NA','NP') default null
+) engine=innodb, charset=utf8, collate=utf8_general_ci;
+
+select group_concat(distinct tipo_acreditacion) from calificaciones;
+
+select * from notas;
+
+select
+	n.no_control,
+  a.nombre,
+  a.paterno,
+  a.materno,
+  n.parcial1,
+  n.asistencias1
+from notas n
+join alumnos a
+  on n.no_control = a.no_control
+where n.no_control = '17325061080099';
+
+
 
 
 
