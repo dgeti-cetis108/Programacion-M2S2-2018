@@ -199,7 +199,29 @@ join alumnos a
   on n.no_control = a.no_control
 where n.no_control = '17325061080099';
 
+-- consulta que muestre los planes de estudio por carrera
+-- que incluya nombre de carrera y nombre de asignatura
+select
+	c.nombre as 'Carrera',
+	a.nombre as 'Asignatura'
+from carreras c
+join asignaturas a
+  on c.id = a.carrera_id;
 
+-- consulta que muestre las asignaturas impartidas por grupo y carrera
+select
+	g.periodo as 'Periodo',
+	g.semestre as 'Semestre',
+	g.turno as 'Turno',
+	g.grupo as 'Grupo',
+	c.nombre as 'Carrera',
+	a.nombre as 'Asignatura'
+from grupos g
+join carreras c
+  on g.carrera_id = c.id
+join asignaturas a
+  on c.id = a.carrera_id;
 
-
-
+-- consulta que muestre tus calificaciones finales
+-- del semestre pasado 'SEMESTRAL 2 - 2017'
+-- NumeroDeControl,NombreDeAlumno,CURP,Grupo,Carrera,Asignatura,Promedio
