@@ -225,3 +225,149 @@ join asignaturas a
 -- consulta que muestre tus calificaciones finales
 -- del semestre pasado 'SEMESTRAL 2 - 2017'
 -- NumeroDeControl,NombreDeAlumno,CURP,Grupo,Carrera,Asignatura,Promedio
+select
+  a.no_control as 'NumeroDeControl',
+  concat(a.nombre, ' ', a.paterno, ' ', a.materno) as 'NombreDeAlumno',
+  a.curp as 'CURP',
+  g.grupo as 'Grupo',
+  c.nombre as 'Carrera',
+  s.nombre as 'Asignatura',
+  (n.parcial1 + n.parcial2 + n.parcial3)/3 as 'Promedio'
+from alumnos a
+join notas n
+  on a.no_control = n.no_control
+join grupos g
+  on n.grupo_id = g.id
+join carreras c
+  on g.carrera_id = c.id
+join asignaturas s
+  on n.asignatura_id = s.id
+where
+  g.periodo = 'SEMESTRAL 2 - 2017' and
+  a.no_control = '17325061080099';
+
+
+-- consultas locochona
+-- alumnos que estuvieron en 2av-pro y no estan en 3av-pro
+select
+  g2.no_control,
+  g2.grupo_id,
+  g2.grupo,
+  g2.periodo
+from
+  (select
+    a.no_control,
+    g.id as 'grupo_id',
+    g.grupo,
+    g.periodo
+  from notas n
+  join alumnos a
+    on n.no_control = a.no_control
+  join grupos g
+    on n.grupo_id = g.id
+  where
+    g.periodo = 'SEMESTRAL 2 - 2017' and
+    g.grupo = '2AV-PRO'
+  group by
+    a.no_control) g2
+left join
+  (select
+    a.no_control,
+    g.id as 'grupo_id',
+    g.grupo,
+    g.periodo
+  from notas n
+  join alumnos a
+    on n.no_control = a.no_control
+  join grupos g
+    on n.grupo_id = g.id
+  where
+    g.periodo = 'SEMESTRAL 1 - 2018' and
+    g.grupo = '3AV-PRO'
+  group by
+    a.no_control) g3
+on g2.no_control = g3.no_control
+where
+  g3.no_control is null;
+
+-- alumnos que estan en 3av-pro y no estuvieron en 2av-pro
+select
+  g2.no_control,
+  g2.grupo_id,
+  g2.grupo,
+  g2.periodo
+from
+  (select
+    a.no_control,
+    g.id as 'grupo_id',
+    g.grupo,
+    g.periodo
+  from notas n
+  join alumnos a
+    on n.no_control = a.no_control
+  join grupos g
+    on n.grupo_id = g.id
+  where
+    g.periodo = 'SEMESTRAL 2 - 2017' and
+    g.grupo = '2AV-PRO'
+  group by
+    a.no_control) g2
+right join
+  (select
+    a.no_control,
+    g.id as 'grupo_id',
+    g.grupo,
+    g.periodo
+  from notas n
+  join alumnos a
+    on n.no_control = a.no_control
+  join grupos g
+    on n.grupo_id = g.id
+  where
+    g.periodo = 'SEMESTRAL 1 - 2018' and
+    g.grupo = '3AV-PRO'
+  group by
+    a.no_control) g3
+on g2.no_control = g3.no_control
+where
+  g2.no_control is null;
+
+-- consulta que muestre alumnos que estuvieron en 2av-pro y estan en 3av-pro
+select
+  g2.no_control,
+  g2.grupo_id,
+  g2.grupo,
+  g2.periodo
+from
+  (select
+    a.no_control,
+    g.id as 'grupo_id',
+    g.grupo,
+    g.periodo
+  from notas n
+  join alumnos a
+    on n.no_control = a.no_control
+  join grupos g
+    on n.grupo_id = g.id
+  where
+    g.periodo = 'SEMESTRAL 2 - 2017' and
+    g.grupo = '2AV-PRO'
+  group by
+    a.no_control) g2
+join
+  (select
+    a.no_control,
+    g.id as 'grupo_id',
+    g.grupo,
+    g.periodo
+  from notas n
+  join alumnos a
+    on n.no_control = a.no_control
+  join grupos g
+    on n.grupo_id = g.id
+  where
+    g.periodo = 'SEMESTRAL 1 - 2018' and
+    g.grupo = '3AV-PRO'
+  group by
+    a.no_control) g3
+on g2.no_control = g3.no_control;
